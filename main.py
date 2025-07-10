@@ -1,5 +1,5 @@
 from src.masks import get_mask_account, get_mask_card_number
-from src.widget import mask_account_card, get_date
+from src.widget import get_date, mask_account_card
 
 # Тест для карты
 print(get_mask_card_number("7000792289606361"))  # 7000 79** **** 6361
@@ -17,7 +17,7 @@ test_cases = [
     "Visa Classic 6831982476737658",
     "Visa Platinum 8990922113665229",
     "Visa Gold 5999414228426353",
-    "Счет 73654108430135874305"
+    "Счет 73654108430135874305",
 ]
 
 for case in test_cases:
