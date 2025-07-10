@@ -1,0 +1,29 @@
+# JetBrains IDE (PyCharm)
+.idea/
+
+# Python-specific ignores
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Poetry files (но оставляем pyproject.toml)
+poetry.lock
+
+# Testing and coverage
+.coverage
+.pytest_cache/
+.mypy_cache/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Project artifacts
+dist/
+build/
+*.egg-info/
