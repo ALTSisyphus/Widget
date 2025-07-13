@@ -7,6 +7,7 @@ def mask_account_card(data: str) -> str:
     :param data: Строка формата "Visa Platinum 7000792289606361" или "Счет 73654108430135874305"
     :return: Строка с замаскированным номером
     """
+    # Определяем тип карты/счета
     parts = data.split()
     if not parts:
         return data
