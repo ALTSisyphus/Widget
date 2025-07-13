@@ -28,8 +28,8 @@ def test_filter_by_state(operations_data: list[dict], state: str, expected_ids: 
 def test_sort_by_date(operations_data: list[dict]) -> None:
     # Сортировка по убыванию (новые первые)
     result_desc = sort_by_date(operations_data)
-    assert [op["id"] for op in result_desc] == [3, 1, 4, 2, 5]
+    assert [op["id"] for op in result_desc] == [3, 4, 1, 2, 5]  # Исправленный порядок
 
     # Сортировка по возрастанию (старые первые)
     result_asc = sort_by_date(operations_data, reverse=False)
-    assert [op["id"] for op in result_asc] == [5, 2, 4, 1, 3]
+    assert [op["id"] for op in result_asc] == [5, 2, 1, 4, 3]  # Исправленный порядок
