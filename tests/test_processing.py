@@ -3,18 +3,6 @@ import pytest
 from src.processing import filter_by_state, sort_by_date
 
 
-# Фикстура для тестовых операций
-@pytest.fixture
-def operations_data() -> list[dict]:
-    return [
-        {"id": 1, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-        {"id": 2, "state": "CANCELED", "date": "2018-06-30T02:08:58.425572"},
-        {"id": 3, "state": "EXECUTED", "date": "2020-01-01T00:00:00.000000"},
-        {"id": 4, "state": "PENDING", "date": "2019-12-31T23:59:59.999999"},
-        {"id": 5, "state": "EXECUTED", "date": "2018-01-01T00:00:00.000000"},
-    ]
-
-
 # Тесты фильтрации по статусу
 @pytest.mark.parametrize(
     "state, expected_ids", [("EXECUTED", [1, 3, 5]), ("CANCELED", [2]), ("PENDING", [4]), ("UNKNOWN", [])]
