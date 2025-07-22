@@ -1,3 +1,5 @@
+from typing import Any, Dict, List
+
 import pytest
 
 
@@ -25,7 +27,7 @@ def account_numbers() -> list[tuple[str, str]]:
 
 # Фикстура для тестовых операций (из test_processing.py)
 @pytest.fixture
-def operations_data() -> list[dict]:
+def operations_data() -> List[Dict[str, Any]]:
     return [
         {"id": 1, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
         {"id": 2, "state": "CANCELED", "date": "2018-06-30T02:08:58.425572"},
@@ -57,4 +59,31 @@ def date_data() -> list[tuple[str, str]]:
         ("2020-01-01T00:00:00.000000", "01.01.2020"),
         ("", ""),  # Пустая строка
         ("Invalid Date", "Invalid Date"),  # Некорректные данные
+    ]
+
+
+# Фикстура для тестовых транзакций по операциям (из generators.py)
+@pytest.fixture
+def sample_transactions() -> List[Dict[str, Any]]:
+    return [
+        {
+            "id": 939719570,
+            "operationAmount": {"amount": "9824.07", "currency": {"code": "USD"}},
+            "description": "Перевод организации",
+        },
+        {
+            "id": 142264268,
+            "operationAmount": {"amount": "79114.93", "currency": {"code": "USD"}},
+            "description": "Перевод со счета на счет",
+        },
+        {
+            "id": 873106923,
+            "operationAmount": {"amount": "43318.34", "currency": {"code": "RUB"}},
+            "description": "Перевод со счета на счет",
+        },
+        {
+            "id": 895315941,
+            "operationAmount": {"amount": "56883.54", "currency": {"code": "USD"}},
+            "description": "Перевод с карты на карту",
+        },
     ]
