@@ -35,6 +35,6 @@ def card_number_generator(start: int, end: int) -> Iterator[str]:
     for num in range(start, end + 1):
         # Форматируем номер с ведущими нулями
         card_num = str(num).zfill(16)
-        # Разбиваем на группы по 4 цифры (убираем пробел перед :)
+        # Разбиваем на группы по 4 цифры
         formatted = " ".join([card_num[i : i + 4] for i in range(0, 16, 4)])
         yield formatted

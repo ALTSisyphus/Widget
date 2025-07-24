@@ -16,4 +16,10 @@ def get_mask_account(account_number: str) -> str:
     :param account_number: Номер счёта
     :return: Маскированная строка
     """
+    if not account_number:
+        return ""
+
+    if len(account_number) < 4:
+        return f"**{account_number}"
+
     return f"**{account_number[-4:]}"
