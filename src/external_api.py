@@ -1,70 +1,57 @@
-"""Вспомогательные функции для работы с внешним API конвертации валют."""
-
 import os
 from typing import Any, Dict
 
-import requests
+import requests  # type: ignore[import]
 
-API_KEY_ENV = "EXCHANGE_RATES_API_KEY"  # имя переменной окружения с API-ключом
-API_BASE = "https://api.apilayer.com/exchangerates_data/convert"  # базовый URL для вызова конверта
+API_KEY_ENV = "EXCHANGE_RATES_API_KEY"
+API_BASE = "https://api.apilayer.com/exchangerates_data/convert"
+DEFAULT_TIMEOUT = 10
 
 
 def convert_to_rub(transaction: Dict[str, Any]) -> float:
-    """Преобразует сумму транзакции в рубли и возвращает ее как плавающую.
-
-        Если валюта уже указана в рублях или не может быть проанализирована, возвращает числовую сумму
-        как плавающую (или 0.0 в случае неустранимой ошибки). Для долларов США и евро функция
-    вызывает API-интерфейс конвертации, используя ключ API, хранящийся в переменной среды
-        EXCHANGE_RATES_API_KEY.
-
-        Аргументы:
-            транзакция: Словарь транзакций, содержащий как минимум ключи:
-                operationAmount -> сумма (str или число)
-                Сумма операции -> валюта -> код (например, "USD", "EUR","RUB")
-
-        Возвращается:
-            Сумма в рублях с плавающей запятой.
     """
-    # Извлекаем сумму и код валюты из структуры транзакции
+    Преобразует сумму транзакции в рубли и возвращает float.
+    Возвращает 0.0 при ошибках (нечисловая сумма, отсутствие API-ключа или ошибка сети).
+    """
+    op = transaction.get("operationAmount") or {}
+    raw_amount = op.get("amount", 0)
+
     try:
-        op = transaction.get("operationAmount", {})
-        amount_raw = op.get("amount")
-        currency = op.get("currency", {}).get("code", "RUB")
-        amount = float(amount_raw)
-    except Exception:
-        # Если не удалось извлечь или привести amount к числу — возвращаем 0.0
+        amount = float(raw_amount)
+    except (TypeError, ValueError):
         return 0.0
 
-    # Если валюта уже рубли — возвращаем сумму как float
-    if currency.upper() == "RUB" or currency == "руб.":
+    cur_obj = op.get("currency")
+    if isinstance(cur_obj, dict):
+        currency = str(cur_obj.get("code", "")).upper()
+    else:
+        currency = str(cur_obj or "").upper()
+
+    if not currency or currency == "RUB":
         return float(amount)
 
-    # Для USD или EUR выполняем вызов внешнего API для получения конвертированной суммы
-    if currency.upper() in ("USD", "EUR"):
-        # Берём ключ API из окружения и формируем заголовки/параметры запроса
-        api_key = os.getenv(API_KEY_ENV, "")
-        headers = {"apikey": api_key} if api_key else {}
-        params = {"from": currency.upper(), "to": "RUB", "amount": str(amount)}
-        try:
-            # Выполняем HTTP GET к endpoint'у конвертации
-            resp = requests.get(API_BASE, headers=headers, params=params, timeout=10)
-            resp.raise_for_status()
-            data = resp.json()
-            # Обычно endpoint возвращает поле 'result' — сконвертированную сумму
-            result = data.get("result")
-            if result is None:
-                # Если 'result' отсутствует, пытаемся использовать поле 'info.rate' как курс
-                rate = data.get("info", {}).get("rate")
-                if rate is None:
-                    # Не удалось получить курс — возвращаем 0.0
-                    return 0.0
-                # Возвращаем product rate * amount
-                return float(rate) * float(amount)
-            # Приводим результат к float и возвращаем
-            return float(result)
-        except Exception:
-            # В случае любых ошибок сетевого взаимодействия или парсинга — безопасно вернуть 0.0
+    if currency in ("USD", "EUR"):
+        api_key = os.environ.get(API_KEY_ENV)
+        if not api_key:
             return 0.0
 
-    # For other currencies - return amount as is (could be extended)
+        headers = {"apikey": api_key}
+        params = {"from": currency, "to": "RUB", "amount": amount}
+
+        try:
+            resp = requests.get(API_BASE, headers=headers, params=params, timeout=DEFAULT_TIMEOUT)
+            resp.raise_for_status()
+            data = resp.json()
+
+            if isinstance(data, dict):
+                if "result" in data and data["result"] is not None:
+                    return float(data["result"])
+                rate = data.get("info", {}).get("rate")
+                if rate is not None:
+                    return float(rate) * float(amount)
+            return 0.0
+        except Exception:
+            # Тесты ожидают 0.0 при Exception (например, mock.side_effect = Exception(...))
+            return 0.0
+
     return float(amount)
