@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, Generator, List
 
 import pytest
 
@@ -92,7 +92,7 @@ def sample_transactions() -> List[Dict[str, Any]]:
 
 # Фикстура для автоматическое удаление тестовых файлов (из decorators.py)
 @pytest.fixture(autouse=True)
-def clean_log_files():
+def clean_log_files() -> Generator[None, None, None]:
     """Автоматически удаляет лог-файлы после тестов"""
     yield
     for filename in ["file_success.log", "file_error.log"]:
