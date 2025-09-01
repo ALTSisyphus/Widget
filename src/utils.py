@@ -1,27 +1,39 @@
-"""Утилиты для чтения JSON-файлов.
+import json
+from pathlib import Path
+from typing import Any, Dict, List
 
-Этот модуль содержит функцию read_json_file, которая безопасно читает
-JSON-файл и возвращает список словарей. Если файл отсутствует, пуст,
-или содержит не-список — возвращается пустой список.
 
-"""
+def read_json_file(path: str) -> List[Dict[str, Any]]:
+    """
+    Читает JSON-файл по пути `path` и возвращает список словарей.
 
+    Возвращает пустой список, если:
+      - путь пустой или файл не найден,
+      - файл пустой,
+      - файл содержит некорректный JSON,
+      - JSON является не списком.
+
+    :param path: путь к JSON-файлу
+    :return: список словарей (transactions) или пустой список
+    """
     if not path:
         return []
 
-    # Попытка открыть и прочитать файл
+    p = Path(path)
     try:
-        with open(path, "r", encoding="utf-8") as fh:
-            content = fh.read()
-            # Если файл пустой (только пробельные символы) — вернуть пустой список
-            if not content.strip():
-                return []
-            data = json.loads(content)
-            # Если содержимое JSON не является списком — вернуть пустой список
-            if not isinstance(data, list):
-                return []
-            return data
-    except (FileNotFoundError, json.JSONDecodeError, PermissionError):
-        # Любая указанная ошибка чтения/парсинга преобразуется в пустой список
+        if not p.exists():
+            return []
+        if p.stat().st_size == 0:
+            return []
 
+        text = p.read_text(encoding="utf-8")
+        if not text or not text.strip():
+            return []
+
+        data = json.loads(text)
+        if not isinstance(data, list):
+            return []
+
+        return [item for item in data if isinstance(item, dict)]
+    except (OSError, json.JSONDecodeError):
         return []
