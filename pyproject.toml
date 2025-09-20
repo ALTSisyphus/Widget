@@ -17,3 +17,18 @@ no_implicit_optional = true
 check_untyped_defs = true
 disallow_untyped_defs = false
 exclude = "tests/|logs/|venv/|.venv/"
+[tool.poetry]
+name = "widget-with-logging"
+version = "0.1.0"
+description = ""
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+pandas = "*"
+openpyxl = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+flake8 = "*"
+isort = "*"
+mypy = "*"
