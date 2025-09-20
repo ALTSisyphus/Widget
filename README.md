@@ -28,13 +28,3 @@ rows_xlsx = read_transactions_excel("data/transactions.xlsx")
 ```bash
 pytest -q
 ```
-
-## Типизация
-
-Весь новый код типизирован, `mypy` не должен выдавать ошибок для новых модулей.
-
-## Как сдавать
-
-Создайте ветку `feature/csv-xlsx` от `develop`, закоммитьте изменения и отправьте Pull Request в `develop`. 
-В описании PR укажите: что сделано, как запустить тесты, и приложите скриншоты успешного `pytest`, `flake8`, `isort`.
-
