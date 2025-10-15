@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "date": "2019-12-08T22:46:21.935582",
+    "description": "Открытие вклада",
+    "from": "Счет 74534456329876543210",
+    "to": "Счет 4321",
+    "state": "EXECUTED",
+    "operationAmount": {
+      "amount": "40542",
+      "currency": {
+        "code": "RUB",
+        "name": "руб."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "date": "2019-11-12T08:15:10.457222",
+    "description": "Перевод с карты на карту",
+    "from": "MasterCard 7771271289353727",
+    "to": "Visa Platinum 1293384478920392",
+    "state": "EXECUTED",
+    "operationAmount": {
+      "amount": "130",
+      "currency": {
+        "code": "USD",
+        "name": "USD"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "date": "2018-07-18T12:43:16.123456",
+    "description": "Перевод организации",
+    "from": "Visa Platinum 7492658374727202",
+    "to": "Счет 0034",
+    "state": "EXECUTED",
+    "operationAmount": {
+      "amount": "8390",
+      "currency": {
+        "code": "RUB",
+        "name": "руб."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "date": "2018-06-03T09:22:11.000000",
+    "description": "Перевод со счета на счет",
+    "from": "Счет 2935",
+    "to": "Счет 4321",
+    "state": "CANCELED",
+    "operationAmount": {
+      "amount": "8200",
+      "currency": {
+        "code": "EUR",
+        "name": "EUR"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "date": "2020-02-15T11:10:05.000000",
+    "description": "Оплата услуг",
+    "from": "Visa Classic 1234567812345678",
+    "to": "ООО Услуги",
+    "state": "PENDING",
+    "operationAmount": {
+      "amount": "1500",
+      "currency": {
+        "code": "RUB",
+        "name": "руб."
+      }
+    }
+  }
+]
