@@ -1,55 +1,81 @@
-from src.masks import get_mask_account, get_mask_card_number
-from src.processing import filter_by_state, sort_by_date
-from src.widget import get_date, mask_account_card
+from __future__ import annotations
 
-# Тест для карты
-print(get_mask_card_number("7000792289606361"))  # 7000 79** **** 6361
+from src.processing import (
+    SUPPORTED_STATUSES,
+    filter_by_status,
+    filter_rub_only,
+    load_transactions,
+    pretty_print,
+    process_bank_search,
+    sort_by_date,
+)
 
-# Тест для счёта
-print(get_mask_account("73654108430135874305"))  # **4305
 
-# Тестирование функции маскировки
-test_cases = [
-    "Visa Platinum 7000792289606361",
-    "Maestro 1596837868705199",
-    "Счет 64686473678894779589",
-    "MasterCard 7158300734726758",
-    "Счет 35383033474447895560",
-    "Visa Classic 6831982476737658",
-    "Visa Platinum 8990922113665229",
-    "Visa Gold 5999414228426353",
-    "Счет 73654108430135874305",
-]
+def _ask(prompt: str) -> str:
+    """Безопасный input с обрезкой пробелов."""
+    return input(prompt).strip()
 
-for case in test_cases:
-    print(mask_account_card(case))
 
-# Тестирование функции даты
-print("\nТестирование даты:")
-print(get_date("2024-03-11T02:26:18.671407"))  # Должно вернуть "11.03.2024"
+def main() -> None:
+    print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
+    print("Выберите необходимый пункт меню:")
+    print("1. Получить информацию о транзакциях из JSON-файла")
+    print("2. Получить информацию о транзакциях из CSV-файла")
+    print("3. Получить информацию о транзакциях из XLSX-файла")
 
-# Тестовые данные
-operations = [
-    {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-    {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-    {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-    {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-]
+    choice = _ask("Ваш выбор: ")
+    ext = {"1": ".json", "2": ".csv", "3": ".xlsx"}.get(choice)
+    if not ext:
+        print("Некорректный выбор. Завершение работы.")
+        return
 
-# Фильтрация по статусу
-print("Фильтрация по EXECUTED:")
-for op in filter_by_state(operations):
-    print(op)
+    print(f"Для обработки выбран {ext.upper()}-файл.")
+    path = _ask("Укажите путь к файлу с транзакциями: ")
 
-print("\nФильтрация по CANCELED:")
-for op in filter_by_state(operations, "CANCELED"):
-    print(op)
+    try:
+        data = load_transactions(path)
+    except Exception as e:
+        print(f"Ошибка загрузки: {e}")
+        return
 
-# Сортировка по дате
-print("\nСортировка по убыванию (новые первые):")
-for op in sort_by_date(operations):
-    print(op)
+    # Фильтрация по статусу
+    print("Введите статус, по которому необходимо выполнить фильтрацию.")
+    print("Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING")
+    while True:
+        status = _ask("Статус: ").upper()
+        if status in SUPPORTED_STATUSES:
+            break
+        print(f'Статус операции "{status}" недоступен.')
+        print("Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING")
 
-print("\nСортировка по возрастанию (старые первые):")
-for op in sort_by_date(operations, reverse=False):
-    print(op)
+    data = filter_by_status(data, status)
+    print(f'Операции отфильтрованы по статусу "{status}"')
+
+    # Сортировка по дате
+    if _ask("Отсортировать операции по дате? Да/Нет: ").lower() in {"да", "y", "yes"}:
+        order = _ask("Отсортировать по возрастанию или по убыванию? ").lower()
+        ascending = ("возрастан" in order) or ("asc" in order)
+        data = sort_by_date(data, ascending=ascending)
+
+    # Только рублевые
+    if _ask("Выводить только рублевые транзакции? Да/Нет: ").lower() in {"да", "y", "yes"}:
+        data = filter_rub_only(data)
+
+    # Поиск по слову/фразе (regexp) в описании
+    if _ask("Отфильтровать список транзакций по определенному слову в описании? Да/Нет: ").lower() in {"да", "y", "yes"}:
+        needle = _ask("Введите слово/фразу (можно использовать регулярное выражение): ")
+        data = process_bank_search(data, needle)
+
+    print("\nРаспечатываю итоговый список транзакций...\n")
+    if not data:
+        print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации")
+        return
+
+    print(f"Всего банковских операций в выборке: {len(data)}\n")
+    for op in data:
+        print(pretty_print(op))
+        print()  # пустая строка между операциями
+
+
+if __name__ == "__main__":
+    main()
