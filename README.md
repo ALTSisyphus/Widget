@@ -1,5 +1,3 @@
-# Widget with logging — CSV/XLSX transactions support
-
 Добавлена поддержка чтения финансовых транзакций из CSV и Excel (XLSX) файлов с помощью `pandas`.
 
 ## Новая функциональность
